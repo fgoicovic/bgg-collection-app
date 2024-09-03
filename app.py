@@ -86,15 +86,11 @@ def get_game_details(username, game_id):
         return jsonify({'error': str(e)}), 500
 
 
-@app.route('/api/selected_games', methods=['GET', 'POST'])
+@app.route('/api/selected_games', methods=['POST'])
 def selected_games():
-    if request.method == 'GET':
-        selected_games = load_selected_games()
-        return jsonify(selected_games)
-    elif request.method == 'POST':
-        selected_games = request.json.get('selected_games', [])
-        save_selected_games(selected_games)
-        return jsonify({'status': 'success'})
+    selected_games = request.json.get('selected_games', [])
+    save_selected_games(selected_games)
+    return jsonify({'status': 'success'})
 
 
 if __name__ == '__main__':

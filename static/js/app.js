@@ -97,11 +97,4 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => alert('Selected games saved successfully!'));
     });
 
-    // Load selected games on page load
-    fetch('/api/selected_games')
-        .then(response => response.json())
-        .then(games => {
-            selectedGames = games;
-            updateSelectedGamesList();
-        });
 });
