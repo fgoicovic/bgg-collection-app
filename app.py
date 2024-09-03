@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, jsonify
 from boardgamegeek import BGGClient
+from boardgamegeek.objects.games import CollectionBoardGame
 import os
+import posixpath
 import json
 
 app = Flask(__name__)
@@ -28,41 +30,57 @@ def index():
     return render_template('index.html')
 
 
+def _read_data_file(filepath):
+    try:
+        with open(filepath, "rb") as fb:
+            data = fb.read()
+            games = json.loads(data.decode())
+    except Exception as e:
+        return None
+
+    return games
+
+
 @app.route('/api/collection', methods=['GET'])
 def get_collection():
     username = request.args.get('username')
-    try:
-        collection = bgg.collection(username, own=True, exclude_subtype="boardgameexpansion")
-        games = [{
-            'id': game.id,
-            'name': game.name,
-            'thumbnail': game.thumbnail,
-            'year_published': game.year,
-            'min_players': game.min_players,
-            'max_players': game.max_players,
-            'playing_time': game.playing_time
-        } for game in collection]
-        return jsonify(games)
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+    filepath = f"data/{username}.json"
+    games = None
+    if posixpath.isfile(filepath):
+        games = _read_data_file(filepath)
+    else:
+        try:
+            collection: list[CollectionBoardGame] = bgg.collection(
+                username, own=True, exclude_subtype="boardgameexpansion"
+            )
+            games = {
+                game.id: {
+                    'name': game.name,
+                    'thumbnail': game.thumbnail,
+                    'year_published': game.year,
+                    'min_players': game.min_players,
+                    'max_players': game.max_players,
+                    'playing_time': game.playing_time,
+                    'plays': game.numplays,
+                    'rating': game.rating
+                }
+                for game in collection
+            }
+            with open(filepath, "wb") as fb:
+                data = json.dumps(games)
+                fb.write(data.encode())
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
+
+    return jsonify(games)
 
 
-@app.route('/api/game_details/<int:game_id>', methods=['GET'])
-def get_game_details(game_id):
+@app.route('/api/<username>/game_details/<game_id>', methods=['GET'])
+def get_game_details(username, game_id):
+    filepath = f"data/{username}.json"
+    games = _read_data_file(filepath)
     try:
-        game = bgg.game(game_id=game_id)
-        game_details = {
-            'name': game.name,
-            'description': game.description,
-            'thumbnail': game.thumbnail,
-            'image': game.image,
-            'year_published': game.year,
-            'min_players': game.min_players,
-            'max_players': game.max_players,
-            'playing_time': game.playing_time,
-            'rating': game.rating_average,
-            'mechanics': game.mechanics
-        }
+        game_details = games.get(game_id)
         return jsonify(game_details)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -80,4 +98,4 @@ def selected_games():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5001)

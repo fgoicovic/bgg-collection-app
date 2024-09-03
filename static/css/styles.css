@@ -6,22 +6,60 @@ body {
 }
 
 .container {
-    max-width: 800px;
+    display: flex;
+    justify-content: space-between;
+    max-width: 1200px;
     margin: 0 auto;
 }
 
+.left-column, .right-column {
+    width: 48%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
 #games-list, #game-details, #selected-games-list {
-    margin: 20px 0;
+    border: 1px solid #ccc;
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 5px;
+    overflow-y: auto;
+}
+
+#games-list {
+    max-height: 600px; /* Adjust height as necessary */
 }
 
 .game, .selected-game {
     padding: 10px;
     border: 1px solid #ccc;
     margin: 5px 0;
-    background-color: #fff;
+    background-color: #fafafa;
     cursor: pointer;
+    border-radius: 5px;
 }
 
 .game:hover, .selected-game:hover {
     background-color: #e0e0e0;
+}
+
+.game-details img {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 10px;
+}
+
+button {
+    padding: 10px;
+    margin-top: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
 }

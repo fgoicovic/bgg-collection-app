@@ -12,30 +12,34 @@ document.addEventListener('DOMContentLoaded', function() {
         if (username) {
             fetch(`/api/collection?username=${username}`)
                 .then(response => response.json())
-                .then(games => displayGames(games));
+                .then(games => displayGames(username, games));
         }
     });
 
-    function displayGames(games) {
+    function displayGames(username, games) {
         gamesListContainer.innerHTML = '';
-        games.forEach(game => {
+        for (const gameId in games){
             const gameDiv = document.createElement('div');
             gameDiv.classList.add('game');
-            gameDiv.innerText = game.name;
+            gameDiv.innerText = games[gameId].name + " (" + games[gameId].year_published + ")";
             gameDiv.addEventListener('click', function() {
-                fetch(`/api/game_details/${game.id}`)
+                fetch(`/api/${username}/game_details/${gameId}`)
                     .then(response => response.json())
-                    .then(details => displayGameDetails(details, game.id));
+                    .then(details => displayGameDetails(details, gameId));
             });
             gamesListContainer.appendChild(gameDiv);
-        });
+        }
     }
 
     function displayGameDetails(details, gameId) {
         gameDetailsContainer.innerHTML = `
-            <h3>${details.name}</h3>
-            <img src="${details.image}" alt="${details.name}">
-            <p>${details.description}</p>
+            <h3>${details.name} (${details.year_published})</h3>
+            <img src="${details.thumbnail}" alt="${details.name}">
+            <ul>
+                <li>Number of plays: ${details.plays}</li>
+                <li>Personal rating: ${details.rating}</li>
+            </ul>
+            <button onclick="window.open('https://www.boardgamegeek.com/boardgame/${gameId}')">See on BoardGameGeek</button>
             <button onclick="addToSelected(${gameId})">Add to Selected</button>
         `;
     }

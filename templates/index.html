@@ -8,12 +8,17 @@
 </head>
 <body>
     <div class="container">
-        <input type="text" id="username" placeholder="Enter BGG username">
-        <button id="fetch-collection">Fetch Collection</button>
-        <div id="games-list"></div>
-        <div id="game-details"></div>
-        <div id="selected-games-list"></div>
-        <button id="save-selected">Save Selected Games</button>
+        <div class="left-column">
+            <input type="text" id="username" placeholder="Enter BGG username">
+            <button id="fetch-collection">Fetch Collection</button>
+            <div id="games-list" class="games-list"></div>
+        </div>
+        <div class="right-column">
+            <div id="game-details" class="game-details"></div>
+            <h3>Selected Games</h3>
+            <div id="selected-games-list" class="selected-games-list"></div>
+            <button id="save-selected">Save Selected Games</button>
+        </div>
     </div>
     <script src="/static/js/app.js"></script>
 </body>
