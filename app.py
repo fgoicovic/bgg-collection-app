@@ -17,12 +17,6 @@ app = Flask(__name__)
 bgg = BGGClient()
 
 
-def save_selected_games(selected_games: list, username: str):
-    filename = f"data/{username}-selected.json"
-    with open(filename, 'w') as file:
-        json.dump(selected_games, file)
-
-
 @app.route('/')
 def index():
     return render_template('index.html')
