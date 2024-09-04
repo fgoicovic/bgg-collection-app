@@ -86,12 +86,33 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     saveButton.addEventListener('click', function() {
+        // Prompt the user for their name and password
+        const userName = prompt('Please enter your name:');
+        const userPassword = prompt('Please enter your password:');
+    
+        // Check if userName or userPassword is empty
+        if (!userName || !userPassword) {
+            alert('Name and password cannot be empty.');
+            return;
+        }
+
+        // Check list of selected games
+        if (selectedGames.length === 0) {
+            alert('No games selected. Nothing to save.');
+            return;
+        }
+        
+        // Fetch the API endpoint with the POST method
         fetch('/api/selected_games', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ selected_games: selectedGames }),
+            body: JSON.stringify({
+                selected_games: selectedGames,
+                user_name: userName,
+                user_password: userPassword
+            }),
         })
         .then(response => response.json())
         .then(data => alert('Selected games saved successfully!'));
