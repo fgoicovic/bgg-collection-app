@@ -53,6 +53,8 @@ document.addEventListener('DOMContentLoaded', function() {
             <h3>${details.name} (${details.year_published})</h3>
             <img src="${details.thumbnail}" alt="${details.name}">
             <ul>
+                <li>Players: ${details.players}</li>
+                <li>Playing time: ${details.playing_time} Min</li>
                 <li>Number of plays: ${details.plays}</li>
                 <li>Personal rating: ${details.rating}</li>
             </ul>

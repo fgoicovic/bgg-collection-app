@@ -51,20 +51,30 @@ def get_collection():
             collection: list[CollectionBoardGame] = bgg.collection(
                 username, own=True, exclude_subtype="boardgameexpansion"
             )
-            games = {
-                game.id: {
+            games = {}
+            for game in collection:
+                if game.min_players < game.max_players:
+                    players = f"{game.min_players}-{game.max_players}"
+                else:
+                    players = f"{game.max_players}"
+
+                if game.min_playing_time < game.max_playing_time:
+                    playing_time = f"{game.min_playing_time}-{game.max_playing_time}"
+                else:
+                    playing_time = f"{game.playing_time}"
+                game_dict = {
                     'id': game.id,
                     'name': game.name,
                     'thumbnail': game.thumbnail,
                     'year_published': game.year,
-                    'min_players': game.min_players,
-                    'max_players': game.max_players,
-                    'playing_time': game.playing_time,
+                    'players': players,
+                    "playing_time": playing_time,
                     'plays': game.numplays,
-                    'rating': game.rating
+                    'rating': game.rating,
+                    'comment': game.comment
                 }
-                for game in collection
-            }
+                games[game.id] = game_dict
+
             with open(filepath, "wb") as fb:
                 data = json.dumps(games)
                 fb.write(data.encode())
