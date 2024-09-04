@@ -53,6 +53,7 @@ def get_collection():
             )
             games = {
                 game.id: {
+                    'id': game.id,
                     'name': game.name,
                     'thumbnail': game.thumbnail,
                     'year_published': game.year,

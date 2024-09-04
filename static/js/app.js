@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const selectedGamesListContainer = document.getElementById('selected-games-list');
     const saveButton = document.getElementById('save-selected');
     let selectedGames = [];
+    let selectedGamesDetails = [];
 
     fetchButton.addEventListener('click', function() {
         const username = usernameInput.value.trim();
@@ -56,32 +57,42 @@ document.addEventListener('DOMContentLoaded', function() {
                 <li>Personal rating: ${details.rating}</li>
             </ul>
             <button onclick="window.open('https://www.boardgamegeek.com/boardgame/${gameId}')">See on BoardGameGeek</button>
-            <button onclick="addToSelected(${gameId})">Add to Selected</button>
+            <button onclick='addToSelected(${gameId}, ${JSON.stringify(details)})'>Add to Selected</button>
         `;
     }
 
-    window.addToSelected = function(gameId) {
+    window.addToSelected = function(gameId,details) {
         if (!selectedGames.includes(gameId)) {
             selectedGames.push(gameId);
+            selectedGamesDetails.push(details);
             updateSelectedGamesList();
         }
     }
 
     function updateSelectedGamesList() {
         selectedGamesListContainer.innerHTML = '';
-        selectedGames.forEach(gameId => {
+        selectedGamesDetails.forEach(game => {
             const gameDiv = document.createElement('div');
             gameDiv.classList.add('selected-game');
             gameDiv.innerHTML = `
-                <span>Game ID: ${gameId}</span>
-                <button onclick="removeFromSelected(${gameId})">Remove</button>
+                <span>${game.name}</span>
+                <button onclick="removeFromSelected(${game.id})">Remove</button>
             `;
+            // Add a click event listener to the div
+            gameDiv.addEventListener('click', function() {
+                const username = usernameInput.value.trim();
+                // Fetch game details from the server
+                fetch(`/api/${username}/game_details/${game.id}`)
+                    .then(response => response.json()) // Convert the response to JSON
+                    .then(details => displayGameDetails(details, game.id)); // Call displayGameDetails with the details and gameId
+            });
             selectedGamesListContainer.appendChild(gameDiv);
         });
     }
 
     window.removeFromSelected = function(gameId) {
         selectedGames = selectedGames.filter(id => id !== gameId);
+        selectedGamesDetails = selectedGamesDetails.filter(game => game.id !== gameId);
         updateSelectedGamesList();
     }
 
