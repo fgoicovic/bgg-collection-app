@@ -5,17 +5,20 @@ document.addEventListener('DOMContentLoaded', function() {
     const gameDetailsContainer = document.getElementById('game-details');
     const selectedGamesListContainer = document.getElementById('selected-games-list');
     const saveButton = document.getElementById('save-selected');
+    const resyncButton = document.getElementById('resync-collection');
     let selectedGames = [];
     let selectedGamesDetails = [];
 
-    fetchButton.addEventListener('click', function() {
-        const username = usernameInput.value.trim();
-        if (username) {
-            fetch(`/api/collection?username=${username}`)
-                .then(response => response.json())
-                .then(games => displayGames(username, games));
-        }
-    });
+    if (fetchButton){
+        fetchButton.addEventListener('click', function() {
+            const username = usernameInput.value.trim();
+            if (username) {
+                fetch(`/api/collection?username=${username}`)
+                    .then(response => response.json())
+                    .then(games => displayGames(username, games));
+            }
+        });
+    }
 
     function displayGames(username, games) {
         // Clear the games list container
@@ -49,6 +52,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function displayGameDetails(details, gameId) {
+        console.log(details);
         gameDetailsContainer.innerHTML = `
             <h3>${details.name} (${details.year_published})</h3>
             <img src="${details.thumbnail}" alt="${details.name}">
@@ -58,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <li>Number of plays: ${details.plays}</li>
                 <li>Personal rating: ${details.rating}</li>
             </ul>
-            <button onclick="window.open('https://www.boardgamegeek.com/boardgame/${gameId}')">See on BoardGameGeek</button>
+            <button onclick="window.open('https://www.boardgamegeek.com/boardgame/${gameId}')">View on BGG</button>
             <button onclick='addToSelected(${gameId}, ${JSON.stringify(details)})'>Add to Selected</button>
         `;
     }
@@ -101,11 +105,15 @@ document.addEventListener('DOMContentLoaded', function() {
     saveButton.addEventListener('click', function() {
         // Prompt the user for their name and password
         const userName = prompt('Please enter your name:');
+        if (!userName) {
+            alert('Name cannot be empty.');
+            return;
+        }
         const userPassword = prompt('Please enter your password:');
     
         // Check if userName or userPassword is empty
-        if (!userName || !userPassword) {
-            alert('Name and password cannot be empty.');
+        if (!userPassword) {
+            alert('Password cannot be empty.');
             return;
         }
 
@@ -124,11 +132,25 @@ document.addEventListener('DOMContentLoaded', function() {
             body: JSON.stringify({
                 selected_games: selectedGames,
                 user_name: userName,
-                user_password: userPassword
+                user_password: userPassword,
+                collection: usernameInput.value.trim()
             }),
         })
         .then(response => response.json())
         .then(data => alert('Selected games saved successfully!'));
+    });
+
+    resyncButton.addEventListener('click', function() {
+        const userName = usernameInput.value.trim();
+        fetch(`/api/collection?username=${userName}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        }
+        )
+        .then(response => response.json())
+        .then(games => displayGames(userName, games));
     });
 
 });

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Fetch Collection{% endblock %}
+
+{% block content %}
+	<h1>Fetch Board Game Collection</h1>
+	<input type="text" id="username" placeholder="Enter your username">
+	<button id="fetch-collection">Fetch Collection</button>
+	<div class="container">
+		<div class="left-panel">
+			<div id="games-list"></div>
+			<button id="resync-collection">Re-sync collection</button>
+		</div>
+		<div class="right-panel">
+			<div id="game-details"></div>
+			<div id="selected-games-list"></div>
+			<button id="save-selected">Save Selected Games</button>
+		</div>
+	</div>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+{% endblock %}

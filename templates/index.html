@@ -1,25 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BGG Collection Manager</title>
-    <link rel="stylesheet" href="/static/css/styles.css">
-</head>
-<body>
-    <div class="container">
-        <div class="left-column">
-            <input type="text" id="username" placeholder="Enter BGG username">
-            <button id="fetch-collection">Fetch Collection</button>
-            <div id="games-list" class="games-list"></div>
-        </div>
-        <div class="right-column">
-            <div id="game-details" class="game-details"></div>
-            <h3>Selected Games</h3>
-            <div id="selected-games-list" class="selected-games-list"></div>
-            <button id="save-selected">Save Selected Games</button>
-        </div>
-    </div>
-    <script src="/static/js/app.js"></script>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+    <h1>Welcome to the Board Game Collection App</h1>
+{% endblock %}

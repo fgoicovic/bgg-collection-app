@@ -24,7 +24,7 @@ body {
     padding-left: 20px;
 }
 
-#games-list, #game-details, #selected-games-list {
+#games-list, #game-details, #selected-games-list, #list-files, #selected-files-list {
     border: 1px solid #ccc;
     padding: 10px;
     background-color: #fff;
@@ -36,7 +36,11 @@ body {
     max-height: 600px; /* Adjust height as necessary */
 }
 
-.game, .selected-game {
+#selected-games-list {
+    max-height: 200px; /* Adjust height as necessary */
+}
+
+.game, .selected-game, .list{
     padding: 10px;
     border: 1px solid #ccc;
     margin: 5px 0;
@@ -45,8 +49,16 @@ body {
     border-radius: 5px;
 }
 
-.game:hover, .selected-game:hover {
+.game:hover, .selected-game:hover, .list:hover {
     background-color: #e0e0e0;
+}
+
+.list {
+    cursor: pointer;
+}
+
+.list.selected {
+    background-color: rgb(95, 95, 95); /* Change to your desired highlight color */
 }
 
 .game-details img {

@@ -1,3 +1,4 @@
 bgg-api
 flask
 cryptography
+python-dotenv
