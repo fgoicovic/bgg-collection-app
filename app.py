@@ -11,6 +11,7 @@ import os
 import posixpath
 import json
 import collections
+import html
 
 from dotenv import load_dotenv
 
@@ -54,15 +55,17 @@ def compare_selection():
 
     # Get the salt and encrypted data for each list
     selected_games = []
-    for list_name in list_names:
+    for i, list_name in enumerate(list_names):
         user_password = read_encrypted_data(f"{list_name}-password.enc", password)
         data = read_encrypted_data(f"{list_name}-selected.enc", user_password)
         data = json.loads(data)
         games = data.get('selected_games', [])
         selected_games.extend(games)
-
-    # Find the repeated elements in the list
-    common_games = [item for item, count in collections.Counter(selected_games).items() if count > 1]
+        if i == 0:
+            continue
+        # Find the repeated elements in the list, starting from the second list
+        common_games = [item for item, count in collections.Counter(selected_games).items() if count > 1]
+        selected_games = common_games
 
     return jsonify(list(common_games))
 
@@ -227,13 +230,14 @@ def _get_collection_from_bgg(username: str):
                 playing_time = f"{game.playing_time}"
             game_dict = {
                 'id': game.id,
-                'name': game.name,
+                'name': html.escape(game.name),
                 'thumbnail': game.thumbnail,
                 'year_published': game.year,
                 'players': players,
                 "playing_time": playing_time,
                 'plays': game.numplays,
-                'rating': game.rating
+                'rating': game.rating,
+                # 'comment': html.escape(game.comment) TODO: Fix special characters in comment
             }
             games[game.id] = game_dict
 

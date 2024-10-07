@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function() {
             gameDiv.classList.add('game');
             
             // Set the inner text of the div to the game's name and year published
-            gameDiv.innerText = `${game.name} (${game.year_published})`;
+            gameDiv.innerHTML = `${game.name} (${game.year_published})`;
             
             // Add a click event listener to the div
             gameDiv.addEventListener('click', function() {
@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', function() {
         selectedGamesListContainer.innerHTML = '';
         selectedGamesDetails.forEach(game => {
             const gameDiv = document.createElement('div');
-            gameDiv.classList.add('selected-game');
+            gameDiv.classList.add('game');
             gameDiv.innerHTML = `
                 <span>${game.name}</span>
                 <button onclick="removeFromSelected(${game.id})">Remove</button>

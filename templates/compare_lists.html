@@ -69,6 +69,13 @@
                     const response = await fetch(`/api/compare-selection?lists=${lists}`);
                     const data = await response.json();
                     console.log('Comparison result:', data); // Debugging
+                    // if the data is empty, display a message
+                    if (data.length === 0) {
+                        const message = document.createElement('div');
+                        message.innerText = 'No games in common';
+                        gamesListContainer.appendChild(message);
+                        return;
+                    }
                     for (const element of data) {
                         const gameDiv = document.createElement('div');
                         gameDiv.classList.add('selected-game');
