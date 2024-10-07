@@ -54,18 +54,27 @@ def compare_selection():
         raise ValueError("Password not found in environment variables")
 
     # Get the salt and encrypted data for each list
-    selected_games = []
-    for i, list_name in enumerate(list_names):
+    common_games_set = None
+    common_games = []
+
+    for list_name in list_names:
         user_password = read_encrypted_data(f"{list_name}-password.enc", password)
         data = read_encrypted_data(f"{list_name}-selected.enc", user_password)
         data = json.loads(data)
-        games = data.get('selected_games', [])
-        selected_games.extend(games)
-        if i == 0:
-            continue
-        # Find the repeated elements in the list, starting from the second list
-        common_games = [item for item, count in collections.Counter(selected_games).items() if count > 1]
-        selected_games = common_games
+        games = set(data.get('selected_games', []))
+
+        if common_games_set is None:
+            common_games_set = games
+        else:
+            common_games_set &= games
+
+    if common_games_set:
+        for game_id in common_games_set:
+            game_name = _get_game_name(game_id)
+            common_games.append(game_name)
+
+    # sort games alphabetically
+    common_games = sorted(common_games)
 
     return jsonify(list(common_games))
 
@@ -100,21 +109,38 @@ def get_collection():
     return jsonify(games)
 
 
-@app.route('/api/<username>/game_details/<game_id>', methods=['GET'])
-def get_game_details(username, game_id):
+def _get_game_details(username, game_id):
     filepath = f"data/{username}.json"
     games = _read_data_file(filepath)
+    if games is None:
+        games = _get_collection_from_bgg(username)
+    game_details = games.get(game_id)
+
+    return game_details
+
+
+@app.route('/api/<username>/game_details/<game_id>', methods=['GET'])
+def get_game_details(username, game_id):
     try:
-        game_details = games.get(game_id)
+        game_details = _get_game_details(username, game_id)
         return jsonify(game_details)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
 
+def _get_game_name(game_id):
+    name = None
+    try:
+        game = bgg.game(game_id=game_id)
+        name = f"{game.name} ({game.year})"
+    except Exception as e:
+        print(f"Error fetching game details for {game_id}: {str(e)}")
+    return name
+
+
 @app.route('/api/game_details/<game_id>', methods=['GET'])
 def get_game_name(game_id):
-    game = bgg.game(game_id=game_id)
-    name = f"{game.name} ({game.year})"
+    name = _get_game_name(game_id)
     return jsonify({'name': name})
 
 
@@ -126,7 +152,7 @@ def selected_games():
     collection: str = request.json.get('collection')
 
     output = {
-        collection: collection,
+        'collection': collection,
         'selected_games': selected_games
     }
     output_data = json.dumps(output)
