@@ -57,11 +57,18 @@ def compare_selection():
     common_games_set = None
     common_games = []
 
+    # In-memory cache for game names (per request), filled from selected lists
+    game_name_cache = {}
+
     for list_name in list_names:
         user_password = read_encrypted_data(f"{list_name}-password.enc", password)
         data = read_encrypted_data(f"{list_name}-selected.enc", user_password)
         data = json.loads(data)
         games = set(data.get('selected_games', []))
+        # Fill cache from selected_game_names if present
+        if 'selected_game_names' in data:
+            for gid, gname in data['selected_game_names'].items():
+                game_name_cache[gid] = gname
 
         if common_games_set is None:
             common_games_set = games
@@ -70,7 +77,11 @@ def compare_selection():
 
     if common_games_set:
         for game_id in common_games_set:
-            game_name = _get_game_name(game_id)
+            if game_id in game_name_cache:
+                game_name = game_name_cache[game_id]
+            else:
+                game_name = _get_game_name(game_id)
+                game_name_cache[game_id] = game_name
             common_games.append(game_name)
 
     # sort games alphabetically
@@ -147,13 +158,15 @@ def get_game_name(game_id):
 @app.route('/api/selected_games', methods=['POST'])
 def selected_games():
     selected_games = request.json.get('selected_games', [])
+    selected_game_names = request.json.get('selected_game_names', {})  # expects {game_id: name}
     username: str = request.json.get('user_name')
     password: str = request.json.get('user_password')
     collection: str = request.json.get('collection')
 
     output = {
         'collection': collection,
-        'selected_games': selected_games
+        'selected_games': selected_games,
+        'selected_game_names': selected_game_names
     }
     output_data = json.dumps(output)
 

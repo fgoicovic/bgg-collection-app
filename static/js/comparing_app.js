@@ -62,11 +62,35 @@ document.addEventListener('DOMContentLoaded', function() {
             for (const element of data) {
                 const gameDiv = document.createElement('div');
                 gameDiv.classList.add('selected-game');
-                // const name = await gameName(element); // Await the gameName function
-                console.log('name:', element); // Debugging
                 gameDiv.innerText = element;
                 gamesListContainer.appendChild(gameDiv);
             }
+            // Add summary text at the bottom
+            const summary = document.createElement('div');
+            summary.style.marginTop = '16px';
+            summary.style.fontWeight = 'bold';
+            summary.innerText = `There is a total of ${data.length} game${data.length === 1 ? '' : 's'} in common.`;
+            gamesListContainer.appendChild(summary);
+
+            // Add export button
+            const exportBtn = document.createElement('button');
+            exportBtn.textContent = 'Export List';
+            exportBtn.style.marginTop = '12px';
+            exportBtn.onclick = function() {
+                const fileContent = data.join('\n');
+                const blob = new Blob([fileContent], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'common_games.txt';
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 0);
+            };
+            gamesListContainer.appendChild(exportBtn);
         } catch (error) {
             console.error('Error comparing lists:', error); // Debugging
         }

@@ -3,5 +3,14 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-    <h1>Welcome to the Board Game Collection App</h1>
+    <div style="max-width: 600px; margin: 40px auto; padding: 32px; background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); text-align: center;">
+        <h1 style="margin-bottom: 16px; font-size: 2.2em; color: #333;">Welcome to the Board Game Collection App</h1>
+        <p style="font-size: 1.15em; color: #444; margin-bottom: 32px;">
+            Manage your board game collection, compare lists with friends, and discover which games you have in common. Start by fetching your collection or comparing lists below!
+        </p>
+        <div style="display: flex; flex-direction: column; gap: 18px; align-items: center;">
+            <a href="{{ url_for('fetch_collection') }}" style="display: inline-block; padding: 14px 32px; background: #4CAF50; color: #fff; border-radius: 6px; text-decoration: none; font-size: 1.1em; font-weight: bold; transition: background 0.2s;">Fetch Your Collection</a>
+            <a href="{{ url_for('compare_lists') }}" style="display: inline-block; padding: 14px 32px; background: #2196F3; color: #fff; border-radius: 6px; text-decoration: none; font-size: 1.1em; font-weight: bold; transition: background 0.2s;">Compare Game Lists</a>
+        </div>
+    </div>
 {% endblock %}
