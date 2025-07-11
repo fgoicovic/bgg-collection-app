@@ -13,12 +13,6 @@ document.addEventListener('DOMContentLoaded', function() {
         fetchButton.addEventListener('click', function() {
             const username = usernameInput.value.trim();
             if (username) {
-                // Reset right panel: clear game details and selected games
-                gameDetailsContainer.innerHTML = '';
-                selectedGames = [];
-                selectedGamesDetails = [];
-                updateSelectedGamesList();
-
                 fetch(`/api/collection?username=${username}`)
                     .then(response => response.json())
                     .then(games => displayGames(username, games));
@@ -128,13 +122,7 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('No games selected. Nothing to save.');
             return;
         }
-
-        // Build selected_game_names as {game_id: 'Game Name (Year)'}
-        const selectedGameNames = {};
-        selectedGamesDetails.forEach(game => {
-            selectedGameNames[game.id] = `${game.name} (${game.year_published})`;
-        });
-
+        
         // Fetch the API endpoint with the POST method
         fetch('/api/selected_games', {
             method: 'POST',
@@ -143,7 +131,6 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             body: JSON.stringify({
                 selected_games: selectedGames,
-                selected_game_names: selectedGameNames,
                 user_name: userName,
                 user_password: userPassword,
                 collection: usernameInput.value.trim()
