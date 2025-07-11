@@ -9,10 +9,16 @@
 <body>
     <header>
         <nav>
-            <ul>
-                <li><a href="{{ url_for('index') }}">Home</a></li>
-                <li><a href="{{ url_for('fetch_collection') }}">Fetch Collection</a></li>
-                <li><a href="{{ url_for('compare_lists') }}">Compare Game Lists</a></li>
+            <ul style="display: flex; gap: 18px; list-style: none; margin: 0; padding: 0; justify-content: center;">
+                <li>
+                    <a href="{{ url_for('index') }}" class="nav-link-btn">Home</a>
+                </li>
+                <li>
+                    <a href="{{ url_for('fetch_collection') }}" class="nav-link-btn">Fetch Collection</a>
+                </li>
+                <li>
+                    <a href="{{ url_for('compare_lists') }}" class="nav-link-btn">Compare Game Lists</a>
+                </li>
             </ul>
         </nav>
     </header>
