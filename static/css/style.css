@@ -111,3 +111,28 @@ button:hover {
 .delete-btn:hover {
     background-color: #b71c1c;
 }
+
+.view-btn {
+    margin-top: 0;
+    margin-left: 8px;
+    padding: 4px 10px;
+    background-color: #1976d2;
+    font-size: 0.85em;
+    flex-shrink: 0;
+}
+
+.view-btn:hover {
+    background-color: #0d47a1;
+}
+
+.close-btn {
+    margin-top: 0;
+    padding: 4px 10px;
+    background-color: #757575;
+    font-size: 0.85em;
+    flex-shrink: 0;
+}
+
+.close-btn:hover {
+    background-color: #424242;
+}

@@ -40,9 +40,58 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     });
 
+                    const viewBtn = document.createElement('button');
+                    viewBtn.classList.add('view-btn');
+                    viewBtn.innerText = 'View';
+                    viewBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const password = prompt(`Enter password for "${file}":`);
+                        if (password === null) return;
+                        fetch(`/api/selected-lists/${encodeURIComponent(file)}/games`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ password })
+                        })
+                            .then(r => r.json())
+                            .then(result => {
+                                if (result.error) {
+                                    alert(result.error);
+                                    return;
+                                }
+                                gamesListContainer.innerHTML = '';
+
+                                const header = document.createElement('div');
+                                header.style.display = 'flex';
+                                header.style.alignItems = 'center';
+                                header.style.justifyContent = 'space-between';
+                                header.style.marginBottom = '8px';
+
+                                const title = document.createElement('h3');
+                                title.style.margin = '0';
+                                title.innerText = `${file}'s list (${result.length} game${result.length === 1 ? '' : 's'})`;
+
+                                const closeBtn = document.createElement('button');
+                                closeBtn.classList.add('close-btn');
+                                closeBtn.innerText = '✕ Close';
+                                closeBtn.addEventListener('click', () => { gamesListContainer.innerHTML = ''; });
+
+                                header.appendChild(title);
+                                header.appendChild(closeBtn);
+                                gamesListContainer.appendChild(header);
+
+                                result.forEach(name => {
+                                    const gameDiv = document.createElement('div');
+                                    gameDiv.classList.add('selected-game');
+                                    gameDiv.innerText = name;
+                                    gamesListContainer.appendChild(gameDiv);
+                                });
+                            });
+                    });
+
                     fileDiv.style.display = 'flex';
                     fileDiv.style.alignItems = 'center';
                     fileDiv.appendChild(label);
+                    fileDiv.appendChild(viewBtn);
                     fileDiv.appendChild(deleteBtn);
                     ListFilesContainer.appendChild(fileDiv);
                 }

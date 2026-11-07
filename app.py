@@ -61,6 +61,18 @@ def delete_list(list_name):
         return jsonify({'error': str(e)}), 500
 
 
+@app.route('/api/selected-lists/<list_name>/games', methods=['POST'])
+def get_list_games(list_name):
+    password = request.json.get('password', '')
+    try:
+        raw = read_encrypted_data(f"{list_name}-selected.enc", password)
+        data = json.loads(raw)
+        game_names = sorted(data.get('selected_game_names', {}).values())
+        return jsonify(game_names)
+    except Exception:
+        return jsonify({'error': 'Invalid password or corrupted data'}), 401
+
+
 @app.route('/api/compare-selection', methods=['GET', 'POST'])
 def compare_selection():
     list_names = request.args.get('lists')
