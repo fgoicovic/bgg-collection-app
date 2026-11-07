@@ -49,6 +49,18 @@ def selected_lists():
     return jsonify(selected_lists)
 
 
+@app.route('/api/selected-lists/<list_name>', methods=['DELETE'])
+def delete_list(list_name):
+    try:
+        for suffix in ("-selected.enc", "-password.enc"):
+            f = DATA_DIR / f"{list_name}{suffix}"
+            if f.exists():
+                f.unlink()
+        return jsonify({'status': 'success'})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 @app.route('/api/compare-selection', methods=['GET', 'POST'])
 def compare_selection():
     list_names = request.args.get('lists')
