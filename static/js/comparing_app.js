@@ -14,8 +14,36 @@ document.addEventListener('DOMContentLoaded', function() {
                 for (const file of files) {
                     const fileDiv = document.createElement('div');
                     fileDiv.classList.add('list');
-                    fileDiv.innerText = `List: ${file}`;
-                    fileDiv.addEventListener('click', () => toggleSelection(fileDiv, file));
+
+                    const label = document.createElement('span');
+                    label.innerText = `List: ${file}`;
+                    label.style.flex = '1';
+                    label.addEventListener('click', () => toggleSelection(fileDiv, file));
+
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.classList.add('delete-btn');
+                    deleteBtn.innerText = 'Delete';
+                    deleteBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        if (confirm(`Delete list "${file}"? This cannot be undone.`)) {
+                            fetch(`/api/selected-lists/${encodeURIComponent(file)}`, { method: 'DELETE' })
+                                .then(r => r.json())
+                                .then(result => {
+                                    if (result.status === 'success') {
+                                        selectedLists = selectedLists.filter(item => item !== file);
+                                        updateSelectedLists();
+                                        displayFiles();
+                                    } else {
+                                        alert(`Error deleting list: ${result.error}`);
+                                    }
+                                });
+                        }
+                    });
+
+                    fileDiv.style.display = 'flex';
+                    fileDiv.style.alignItems = 'center';
+                    fileDiv.appendChild(label);
+                    fileDiv.appendChild(deleteBtn);
                     ListFilesContainer.appendChild(fileDiv);
                 }
             })
