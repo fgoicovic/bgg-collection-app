@@ -8,18 +8,23 @@ from cryptography.hazmat.primitives import padding
 from cryptography.hazmat.backends import default_backend
 
 import os
-import posixpath
 import json
-import collections
 import html
 
 from dotenv import load_dotenv
+from pathlib import Path
 
-load_dotenv()
+BASE_DIR = Path(__file__).parent
+DATA_DIR = BASE_DIR / "data"
+
+load_dotenv(BASE_DIR / ".env")
 
 app = Flask(__name__)
 
-bgg = BGGClient()
+bgg_access_token = os.getenv('BGG_ACCESS_TOKEN')
+if not bgg_access_token:
+    raise ValueError("BGG_ACCESS_TOKEN not set in environment")
+bgg = BGGClient(access_token=bgg_access_token)
 
 
 @app.route('/')
@@ -39,7 +44,7 @@ def compare_lists():
 
 @app.route('/api/selected-lists', methods=['GET'])
 def selected_lists():
-    files = os.listdir("data")
+    files = os.listdir(DATA_DIR)
     selected_lists = [file.removesuffix("-selected.enc") for file in files if file.endswith("-selected.enc")]
     return jsonify(selected_lists)
 
@@ -108,8 +113,8 @@ def get_collection():
     if request.method == 'POST':
         games = _get_collection_from_bgg(username)
     else:
-        filepath = f"data/{username}.json"
-        if posixpath.isfile(filepath):
+        filepath = DATA_DIR / f"{username}.json"
+        if filepath.is_file():
             games = _read_data_file(filepath)
         else:
             games = _get_collection_from_bgg(username)
@@ -121,7 +126,7 @@ def get_collection():
 
 
 def _get_game_details(username, game_id):
-    filepath = f"data/{username}.json"
+    filepath = DATA_DIR / f"{username}.json"
     games = _read_data_file(filepath)
     if games is None:
         games = _get_collection_from_bgg(username)
@@ -194,7 +199,7 @@ def derive_key(password: str, salt: bytes) -> bytes:
 
 
 def read_encrypted_data(filename, password):
-    data_file = f"data/{filename}"
+    data_file = DATA_DIR / filename
 
     with open(data_file, "rb") as fb:
         encrypted_data = fb.read()
@@ -231,7 +236,7 @@ def store_encrypted_data(filename: str, password: str, data: str):
     cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
     encryptor = cipher.encryptor()
 
-    file_path = f"data/{filename}"
+    file_path = DATA_DIR / filename
     # Convert the input string to bytes
     data_bytes = data.encode()
 
@@ -280,7 +285,7 @@ def _get_collection_from_bgg(username: str):
             }
             games[game.id] = game_dict
 
-        filepath = f"data/{username}.json"
+        filepath = DATA_DIR / f"{username}.json"
         with open(filepath, "wb") as fb:
             data = json.dumps(games)
             fb.write(data.encode())
